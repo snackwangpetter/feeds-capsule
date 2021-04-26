@@ -372,8 +372,9 @@ export class SearchPage implements OnInit {
 
   async handleJump(clickType:string){
     if(clickType === "scanService"){
-      let scannedContent = await this.intentService.scanQRCode() || "";
-      this.checkValid(scannedContent);
+      this.native.navigateForward(['/scan'], "");
+      // let scannedContent = await this.intentService.scanQRCode() || "";
+      // this.checkValid(scannedContent);
       return;
     }
   }
