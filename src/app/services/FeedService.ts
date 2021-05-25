@@ -5075,14 +5075,18 @@ export class FeedService {
 
   decodeSignInData(result: any): Promise<string>{
     return new Promise((resolve, reject) =>{
-      didManager.VerifiablePresentationBuilder.fromJson(JSON.stringify(result.presentation), async (presentation) => {
+      didManager.VerifiablePresentationBuilder.fromJson(JSON.stringify(result), async (presentation) => {
+        console.log("result = "+JSON.stringify(result));
+        console.log("presentation = "+JSON.stringify(presentation));
         let credentials = presentation.getCredentials();
+        console.log("credentials = "+JSON.stringify(credentials));
         let did = result.did;
         this.saveCredentialById(did,credentials, "name");
 
         let interests = this.findCredentialValueById(did, credentials, "interests", "");
+        console.log("interests = "+JSON.stringify(interests));
         let desc = this.findCredentialValueById(did, credentials, "description", "");
-
+        console.log("desc = "+JSON.stringify(desc));
         let description = this.translate.instant("DIDdata.NoDescription");
 
         if (desc !== "") {
@@ -5137,8 +5141,10 @@ export class FeedService {
   credaccess(): Promise<any>{
     return new Promise(async (resolve, reject) =>{
       try {
-        let response = await this.intentService.credaccessWithParams();
-        if (response && response.presentation) {
+        let response = await this.standardAuth.getCredentials();
+        console.log('response, ', response);
+        // let response = await this.intentService.credaccessWithParams();
+        if (response) {
           resolve(response);
           return;
         }
