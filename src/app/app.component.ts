@@ -328,6 +328,10 @@ export class MyApp {
     this.native.navigateForward('/menu/profiledetail',"");
   }
 
+  test(){
+    this.native.navigateForward('test',"");
+  }
+
   public isIOSPlatform(): boolean{
     if (this.platform.is('ios')){
       return true;

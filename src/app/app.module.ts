@@ -68,6 +68,7 @@ import { RewriteFrames } from '@sentry/integrations';
 import { customAnimation } from 'src/app/services/nav_anamition';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx';
 import { LanguageService } from 'src/app/services/language.service';
+import { NFTContractService } from 'src/app/services/NFTContractService';
 import * as Sentry from "@sentry/browser";
 
 Sentry.init({
@@ -201,6 +202,7 @@ export function TranslateLoaderFactory() {
     ScanService,
     LanguageService,
     BarcodeScanner,
+    NFTContractService,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     {provide: ErrorHandler, useClass: ErrorHandler}
   ]

@@ -49,9 +49,14 @@
             ],
             "scripts": [],
             "allowedCommonJsDependencies": [
+              "easyqrcodejs",
+              "hash.js",
+              "web3",
+              "bignumber.js",
               "lodash",
               "hammerjs",
               "qrcode",
+              "@walletconnect/client",
               "src/app/services/SerializeDataService"
             ]
           },
