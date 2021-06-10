@@ -14,10 +14,19 @@ export class NFTContractService {
     constructor() {
     }
 
-    init(){
+    async init(){
         // this.web3 = new Web3(new Web3.providers.HttpProvider(this.rpcUrl));
         // this.stickerContract = new this.web3.eth.Contract(contract.stickerABI, this.stickerAddr);
-        this.setupWalletConnectProvider();
+        await this.setupWalletConnectProvider();
+
+        //  Get Chain Id
+        const chainId = await this.walletConnectWeb3.eth.getChainId();
+        console.log("Chain ID: ", chainId);
+
+        if (chainId != 20 && chainId != 21) {
+          console.error("ERROR: Connected to wrong ethereum network "+chainId+". Not an elastos network. Check that the wallet app is using an Elastos network.");
+          return;
+        }
     }
 
     async mint(){
@@ -59,90 +68,118 @@ export class NFTContractService {
             return;
           }
   }
-
   private async setupWalletConnectProvider() {
-    // const provider = new WalletConnectProvider({
-    //   rpc: {
-    //     1: "https://mainnet.mycustomnode.com",
-    //     3: "https://ropsten.mycustomnode.com",
-    //     100: "https://dai.poa.network",
-    //     // ...
-    //   },
-    // });
-    
-    // console.log("111111");
-    // console.log("1111112222222");
-    // //  Enable session (triggers QR Code modal)
-    // try{
-    //   await provider.enable();
-    //   console.log("3333");
-
-    // }catch(error){
-    //   console.log("2222");
-    //   console.log(error);
-    // }
-
-
-
-
-
     //  Create WalletConnect Provider
     this.walletConnectProvider = new WalletConnectProvider({
       rpc: {
         // 20: "https://testnet.elastos.io/eth",
         21: "https://api-testnet.elastos.io/eth",
       },
-      bridge: "https://bridge.walletconnect.org/hello"
-      // bridge: "https://bridge.walletconnect.org/"
-      //bridge: "http://192.168.31.114:5001"
+      // bridge: "https://walletconnect.elastos.net/v1"
+      // bridge: "http://192.168.31.114:5001"
       //bridge: "http://192.168.1.6:5001"
+
+      infuraId: "27e484dcd9e3efcfd25a83a78777cdf1",
+      qrcodeModalOptions: {
+        mobileLinks: [
+          "rainbow",
+          "metamask",
+          "argent",
+          "trust",
+          "imtoken",
+          "pillar",
+        ],
+      },
     });
 
     console.log("Connected?", this.walletConnectProvider.connected);
 
     // Subscribe to accounts change
     this.walletConnectProvider.on("accountsChanged", (accounts: string[]) => {
-      console.log("77777777777777777");
       console.log(accounts);
     });
 
     // Subscribe to chainId change
     this.walletConnectProvider.on("chainChanged", (chainId: number) => {
-      console.log("8888888888");
       console.log(chainId);
     });
 
     // Subscribe to session disconnection
     this.walletConnectProvider.on("disconnect", (code: number, reason: string) => {
-      console.log("9999999999");
       console.log(code, reason);
     });
 
     // Subscribe to session disconnection
     this.walletConnectProvider.on("error", (code: number, reason: string) => {
-      console.log("000000000");
       console.error(code, reason);
     });
 
     //  Enable session (triggers QR Code modal)
     console.log("Connecting to wallet connect");
-    console.log("11111111111");
-    this.walletConnectProvider.enable().then((result)=>{
-      console.log("----------");
-      console.log(result);
-    }).catch((error)=>{
-      console.log("+++++++++++");
-      console.log(error);
-    })
     let enabled = await this.walletConnectProvider.enable();
-    // console.log("22222222222222");
     console.log("CONNECTED to wallet connect", enabled, this.walletConnectProvider);
 
     this.walletConnectWeb3 = new Web3(this.walletConnectProvider as any); // HACK
-
-    console.log("33333333333");
-    console.log(this.walletConnectWeb3);
   }
+
+  // private async setupWalletConnectProvider() {
+  //   //  Create WalletConnect Provider
+  //   this.walletConnectProvider = new WalletConnectProvider({
+  //     rpc: {
+  //       // 20: "https://testnet.elastos.io/eth",
+  //       21: "https://api-testnet.elastos.io/eth",
+  //     },
+  //     bridge: "https://bridge.walletconnect.org/hello"
+  //     // bridge: "https://bridge.walletconnect.org/"
+  //     //bridge: "http://192.168.31.114:5001"
+  //     //bridge: "http://192.168.1.6:5001"
+  //   });
+
+  //   console.log("Connected?", this.walletConnectProvider.connected);
+
+  //   // Subscribe to accounts change
+  //   this.walletConnectProvider.on("accountsChanged", (accounts: string[]) => {
+  //     console.log("77777777777777777");
+  //     console.log(accounts);
+  //   });
+
+  //   // Subscribe to chainId change
+  //   this.walletConnectProvider.on("chainChanged", (chainId: number) => {
+  //     console.log("8888888888");
+  //     console.log(chainId);
+  //   });
+
+  //   // Subscribe to session disconnection
+  //   this.walletConnectProvider.on("disconnect", (code: number, reason: string) => {
+  //     console.log("9999999999");
+  //     console.log(code, reason);
+  //   });
+
+  //   // Subscribe to session disconnection
+  //   this.walletConnectProvider.on("error", (code: number, reason: string) => {
+  //     console.log("000000000");
+  //     console.error(code, reason);
+  //   });
+
+  //   //  Enable session (triggers QR Code modal)
+  //   console.log("Connecting to wallet connect");
+  //   console.log("11111111111");
+  //   this.walletConnectProvider.enable().then((result)=>{
+  //     console.log("----------");
+  //     console.log(result);
+  //   }).catch((error)=>{
+  //     console.log("+++++++++++");
+  //     console.log(error);
+  //   })
+  //   let enabled = await this.walletConnectProvider.enable();
+  //   // console.log("22222222222222");
+  //   console.log("CONNECTED to wallet connect", enabled, this.walletConnectProvider);
+
+  //   this.walletConnectWeb3 = new Web3(this.walletConnectProvider as any); // HACK
+
+  //   console.log("33333333333");
+  //   console.log(this.walletConnectWeb3);
+  // }
 
   public async testWalletConnectMint() {
     const accounts = await this.walletConnectWeb3.eth.getAccounts();
@@ -185,4 +222,17 @@ export class NFTContractService {
         });
   }
 
+
+  public async disconnect(){
+    if (this.walletConnectProvider) {
+      console.log("Disconnecting from wallet connect");
+      //await this.walletConnectProvider.disconnect();
+      await (await this.walletConnectProvider.getWalletConnector()).killSession();
+      console.log("Disconnected from wallet connect");
+      this.walletConnectProvider = null;
+    }
+    else {
+      console.log("Not connected to wallet connect");
+    }
+  }
 }

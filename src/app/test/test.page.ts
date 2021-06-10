@@ -53,12 +53,16 @@ export class TestPage implements OnInit {
   ngOnInit() {
   }
 
-  setup(){
+  connect(){
     this.nftContractService.init();
   }
 
   mint(){
     this.nftContractService.testWalletConnectMint();
+  }
+
+  disconnect(){
+    this.nftContractService.disconnect();
   }
 
 
