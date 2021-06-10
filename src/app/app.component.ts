@@ -330,6 +330,7 @@ export class MyApp {
 
   test(){
     this.native.navigateForward('test',"");
+    // this.native.navigateForward('home',"");
   }
 
   public isIOSPlatform(): boolean{

@@ -30,6 +30,7 @@
       "cordova-plugin-media-capture",
       "cordova-plugin-network-information"
     ],
+    "resolveJsonModule": true,
     "paths": {
       "crypto": [
         "node_modules/crypto-browserify"

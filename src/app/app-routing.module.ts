@@ -44,6 +44,8 @@ const routes: Routes = [
   { path: 'feedspreferences', loadChildren: './pages/feedspreferences/feedspreferences.module#FeedspreferencesPageModule' },
   { path: 'language', loadChildren: './pages/settings/language/language.module#LanguagePageModule' },
   { path: 'test', loadChildren: './test/test.module#TestPageModule' }
+  // { path: 'home', loadChildren: './home/home.module#HomePageModule' }
+
 ];
 
 @NgModule({
