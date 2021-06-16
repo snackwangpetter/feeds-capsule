@@ -67,7 +67,6 @@ let eventBus: Events = null;
 
 @Injectable()
 export class FeedService {
-  public nftAssetList:any = [];
   public bindPublisherAccountType:string = "";
   public discoverfeeds:any = [];
   public currentFeed:any = null;
@@ -5526,13 +5525,4 @@ export class FeedService {
   setBindPublisherAccountType(publisherAccountType:string){
     this.bindPublisherAccountType = publisherAccountType;
   }
-
-  getNftAssetList(){
-    return this.nftAssetList;
-  }
-
-  setNftAssetList(nftAssetList:any){
-    this.nftAssetList = nftAssetList;
-  }
-
 }
