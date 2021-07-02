@@ -58,7 +58,7 @@ export class TestPage implements OnInit {
   }
 
   mint(){
-    this.nftContractService.testWalletConnectMint();
+    this.nftContractService.sendtransaction();
   }
 
   disconnect(){

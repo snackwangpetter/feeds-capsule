@@ -70,6 +70,8 @@ import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx';
 import { LanguageService } from 'src/app/services/language.service';
 import { NFTContractService } from 'src/app/services/NFTContractService';
 import * as Sentry from "@sentry/browser";
+import { Web3ModalModule, Web3ModalComponent, Web3ModalService } from '@mindsorg/web3modal-angular';
+
 
 Sentry.init({
   dsn: "https://4196003a1c864f5798dd2be18be5cb48@o339076.ingest.sentry.io/5524842",
@@ -140,6 +142,7 @@ export function TranslateLoaderFactory() {
     AppRoutingModule,
     ComponentsModule,
     SplashscreenPageModule,
+    Web3ModalModule,
     IonicModule.forRoot({
       rippleEffect: true,
       mode: 'ios',
@@ -203,6 +206,12 @@ export function TranslateLoaderFactory() {
     LanguageService,
     BarcodeScanner,
     NFTContractService,
+    {
+      provide: Web3ModalService,
+      useFactory: () => {
+        return new Web3ModalService();
+      },
+    },
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     {provide: ErrorHandler, useClass: ErrorHandler}
   ]
