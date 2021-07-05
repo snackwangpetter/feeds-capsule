@@ -54,11 +54,11 @@ export class TestPage implements OnInit {
   }
 
   connect(){
-    this.nftContractService.init();
+    this.nftContractService.connect();
   }
 
   mint(){
-    this.nftContractService.sendtransaction();
+    this.nftContractService.testWalletConnectMint();
   }
 
   disconnect(){
