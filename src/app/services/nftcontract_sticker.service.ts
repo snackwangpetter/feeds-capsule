@@ -94,7 +94,11 @@ export class NFTContractStickerService {
 
     async createTxParams(data){
       let accountAddress = this.walletConnectControllerService.getAccountAddress();
-      let gas = await this.web3.eth.estimateGas(data)
+      let gas = await this.web3.eth.estimateGas(data,(error,gas)=>{
+        console.log("===gas error===",error);;
+        console.log("===gas gas===",gas);;
+
+      })
       console.log("===gas ===",gas);
       let gasPrice = await this.web3.eth.getGasPrice();
       return {
@@ -104,5 +108,47 @@ export class NFTContractStickerService {
         gas: Math.round(gas*3),
         value: 0
       };
+    }
+
+
+    public async testWalletConnectMint() {
+      let contractAbi = require("../../assets/contracts/erc721.abi.json");
+      // let contractAbi = contracttest.stickerABI;
+      let contractAddress = "0x5b462bac2d07223711aA0e911c846e5e0E787654"; // Elastos Testnet
+      let accountAddress = this.walletConnectControllerService.getAccountAddress();
+      let walletConnectWeb3 = this.walletConnectControllerService.getWeb3();
+      let contract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
+      console.log(contract);
+  
+      let gasPrice = await walletConnectWeb3.eth.getGasPrice();
+      console.log("Gas price:", gasPrice);
+  
+      console.log("Sending transaction with account address:", accountAddress);
+      let transactionParams = {
+          from: accountAddress,
+          gasPrice: gasPrice,
+          gas: 5000000,
+          value: 0
+      };
+  
+      let tokenId = Math.floor(Math.random()*10000000000);
+      let tokenUri = "https://my.token.uri.com";
+      console.log("Calling smart contract through wallet connect", accountAddress, tokenId, tokenUri);
+      contract.methods.mint(accountAddress, tokenId, tokenUri).send(transactionParams)
+          .on('transactionHash', (hash) => {
+            console.log("transactionHash==>", hash);
+          })
+          .on('receipt', (receipt) => {
+            console.log("receipt==>", receipt);
+          })
+          .on('confirmation', (confirmationNumber, receipt) => {
+            console.log("confirmation==>", confirmationNumber, receipt);
+          })
+          .on('error', (error, receipt) => {
+            console.error("mint error===>",error,receipt);
+          })
+          // .then((result)=>{
+          //   console.log("receive result=>",result);
+          // });
     }
 }

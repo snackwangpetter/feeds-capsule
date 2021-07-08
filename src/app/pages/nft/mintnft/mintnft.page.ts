@@ -320,7 +320,9 @@ export class MintnftPage implements OnInit {
   //     data:mintData
   //   };
   //  let receipt = await this.web3Service.sendTxWaitForReceipt(mintTx,accCreator) || "";
-    let receipt = await this.nftContractStickerService.mint(tokenId, supply, uri, royalty);
+    // let receipt = await this.nftContractStickerService.mint(tokenId, supply, uri, royalty);
+    await this.nftContractStickerService.testWalletConnectMint();
+    let receipt = "";
    receipt = receipt || "";
    if(receipt=== ""){
     this.native.hideLoading();
