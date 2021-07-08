@@ -12,6 +12,7 @@ import { File,DirectoryEntry} from '@ionic-native/file/ngx';
 import { HttpService } from '../../../services/HttpService';
 import { ApiUrl } from '../../../services/ApiUrl';
 import { FeedService } from '../../../services/FeedService';
+import { NFTContractStickerService } from 'src/app/services/nftcontract_sticker.service';
 
 @Component({
   selector: 'app-mintnft',
@@ -52,7 +53,8 @@ export class MintnftPage implements OnInit {
     private file:File,
     private web3Service:Web3Service,
     private feedService:FeedService,
-    public theme:ThemeService) { }
+    public theme:ThemeService,
+    private nftContractStickerService: NFTContractStickerService) { }
 
   ngOnInit() {
   }
@@ -299,23 +301,26 @@ export class MintnftPage implements OnInit {
 
   async mintContract(tokenId:any,uri:any,supply:any,royalty:any){
 
-    let stickerAddr = this.web3Service.getStickerAddr();
-    let stickerContract = this.web3Service.getSticker();
-    let pasarContract = this.web3Service.getPasar();
-    let sellerAddress = this.web3Service.getSellerAddress();
-    const sellerInfo = await pasarContract.methods.getSellerByAddr(sellerAddress).call();
-    this.orderId  =  sellerInfo[2];
-    const accCreator = await this.web3Service.getAccount("04868f294d8ef6e1079752cd2e1f027a126b44ee27040d949a88f89bddc15f31");
-    let parm = {"tokenId:":tokenId,"supply":supply,"uri":uri,"royalty":royalty}
-    console.log("==mintData parm=="+JSON.stringify(parm));
-    const mintData = stickerContract.methods.mint(tokenId,supply,uri,royalty).encodeABI();
-    let mintTx = {
-      from: accCreator.address,
-      to: stickerAddr,
-      value: 0,
-      data:mintData
-    };
-   let receipt = await this.web3Service.sendTxWaitForReceipt(mintTx,accCreator) || "";
+    // let stickerAddr = this.web3Service.getStickerAddr();
+    // let stickerContract = this.web3Service.getSticker();
+    // let pasarContract = this.web3Service.getPasar();
+    // let sellerAddress = this.web3Service.getSellerAddress();
+    // const sellerInfo = await pasarContract.methods.getSellerByAddr(sellerAddress).call();
+    // this.orderId  =  sellerInfo[2];
+    // const accCreator = await this.web3Service.getAccount("04868f294d8ef6e1079752cd2e1f027a126b44ee27040d949a88f89bddc15f31");
+    // let parm = {"tokenId:":tokenId,"supply":supply,"uri":uri,"royalty":royalty}
+    // console.log("==mintData parm=="+JSON.stringify(parm));
+    // const mintData = stickerContract.methods.mint(tokenId,supply,uri,royalty).encodeABI();
+    // console.log("==22222222222");
+
+  //   let mintTx = {
+  //     from: accCreator.address,
+  //     to: stickerAddr,
+  //     value: 0,
+  //     data:mintData
+  //   };
+  //  let receipt = await this.web3Service.sendTxWaitForReceipt(mintTx,accCreator) || "";
+    let receipt = await this.nftContractStickerService.mint(tokenId, supply, uri, royalty);
    receipt = receipt || "";
    if(receipt=== ""){
     this.native.hideLoading();
@@ -323,7 +328,7 @@ export class MintnftPage implements OnInit {
    return;
    }
    if(receipt!=""&&this.curPublishtoPasar){
-    this.handlePasar(accCreator,tokenId);
+    // this.handlePasar(accCreator,tokenId);
     return;
    }
    this.native.hideLoading();

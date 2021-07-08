@@ -112,4 +112,8 @@ export class NFTContractParsarService {
     async getBuyerByAddr(address){
       return await this.pasarContract.methods.getBuyerByAddr(address).call()
     }
+
+    getAddress(){
+      return this.pasarAddr;
+    }
 }

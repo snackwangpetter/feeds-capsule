@@ -21,8 +21,27 @@ export class NFTContractStickerService {
     }
 
     setApprovalForAll(address: string, approved: boolean){
-      //TODO write
-      return this.stickerContract.methods.setApprovalForAll(address, approved).encodeABI();
+      return new Promise(async (resolve, reject) => {
+        const data = this.stickerContract.methods.setApprovalForAll(address, approved).encodeABI();
+        let transactionParams = await this.createTxParams(data);
+        console.log("Calling smart contract through wallet connect", data, transactionParams);
+        this.stickerContract.methods.setApprovalForAll(address, approved).send(transactionParams)
+            .on('transactionHash', (hash) => {
+              console.log("transactionHash", hash);
+            })
+            .on('receipt', (receipt) => {
+              resolve(receipt);
+              console.log("receipt", receipt);
+            })
+            .on('confirmation', (confirmationNumber, receipt) => {
+              console.log("confirmation", confirmationNumber, receipt);
+            })
+            .on('error', (error, receipt) => {
+              resolve(receipt);
+              console.error("mint error===");
+              console.error("error", error);
+            });
+      })
     }
 
     async tokenInfo(tokenId){
@@ -31,38 +50,38 @@ export class NFTContractStickerService {
       return await this.stickerContract.methods.tokenInfo(tokenId).call();
     }
 
-    async mint(tokenId, supply, uri, royalty){
-      //TODO write
+    async mint(tokenId, supply, uri, royalty): Promise<any>{
+      return new Promise(async (resolve, reject) => {
+        console.log("1111111111111",tokenId,supply,uri,royalty);
 
-      let accountAddress = this.walletConnectControllerService.getAccountAddress();
-      // this.stickerContract.methods.mint(tokenId,supply,uri,royalty).encodeABI();
-
-      let gasPrice = await this.web3.eth.getGasPrice();
-      console.log("Gas price:", gasPrice);
-  
-      console.log("Sending transaction with account address:", accountAddress);
-      let transactionParams = {
-          from: accountAddress,
-          gasPrice: gasPrice,
-          gas: 5000000,
-          value: 0
-      };
-  
-      console.log("Calling smart contract through wallet connect", accountAddress, tokenId, uri);
-      this.stickerContract.methods.mint(accountAddress, tokenId, uri).send(transactionParams)
-          .on('transactionHash', (hash) => {
-            console.log("transactionHash", hash);
-          })
-          .on('receipt', (receipt) => {
-            console.log("receipt", receipt);
-          })
-          .on('confirmation', (confirmationNumber, receipt) => {
-            console.log("confirmation", confirmationNumber, receipt);
-          })
-          .on('error', (error, receipt) => {
-            console.error("mint error===");
-            console.error("error", error);
-          });
+        const mintdata = this.stickerContract.methods.mint(tokenId,supply,uri,royalty).encodeABI();
+        const txData = {
+          from: this.walletConnectControllerService.getAccountAddress(),
+          to: this.stickerAddr,
+          value: 0,
+          data: mintdata
+        };
+        console.log("22222222222222",txData);
+        let transactionParams = await this.createTxParams(txData);
+    
+        console.log("Calling smart contract through wallet connect", txData, transactionParams);
+        this.stickerContract.methods.mint(tokenId, supply, uri, royalty).send(transactionParams)
+            .on('transactionHash', (hash) => {
+              console.log("transactionHash", hash);
+            })
+            .on('receipt', (receipt) => {
+              resolve(receipt);
+              console.log("receipt", receipt);
+            })
+            .on('confirmation', (confirmationNumber, receipt) => {
+              console.log("confirmation", confirmationNumber, receipt);
+            })
+            .on('error', (error, receipt) => {
+              resolve(receipt);
+              console.error("mint error===");
+              console.error("error", error);
+            });
+      });
     }
     
     async tokenIdOfOwnerByIndex(address, index){
@@ -71,5 +90,19 @@ export class NFTContractStickerService {
 
     async tokenCountOfOwner(address){
       return await this.stickerContract.methods.tokenCountOfOwner(address).call();
+    }
+
+    async createTxParams(data){
+      let accountAddress = this.walletConnectControllerService.getAccountAddress();
+      let gas = await this.web3.eth.estimateGas(data)
+      console.log("===gas ===",gas);
+      let gasPrice = await this.web3.eth.getGasPrice();
+      return {
+        from: accountAddress,
+        // to: stickerAddr,
+        gasPrice: gasPrice,
+        gas: Math.round(gas*3),
+        value: 0
+      };
     }
 }
