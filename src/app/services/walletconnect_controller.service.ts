@@ -31,7 +31,7 @@ export class WalletConnectControllerService {
       this.walletConnectProvider = new WalletConnectProvider({
         rpc: this.rpc,
         infuraId: "0dd3ab5ca24946938c6d411a1637cc59",
-
+        bridge: "https://walletconnect.elastos.net/v1",
         qrcodeModalOptions: {
           mobileLinks: [
             "metamask",

@@ -52,6 +52,7 @@ export class NFTContractStickerService {
 
     async mint(tokenId, supply, uri, royalty): Promise<any>{
       return new Promise(async (resolve, reject) => {
+
         console.log("1111111111111",tokenId,supply,uri,royalty);
 
         const mintdata = this.stickerContract.methods.mint(tokenId,supply,uri,royalty).encodeABI();
@@ -65,6 +66,8 @@ export class NFTContractStickerService {
         let transactionParams = await this.createTxParams(txData);
     
         console.log("Calling smart contract through wallet connect", txData, transactionParams);
+        this.checkTokenState(tokenId);
+        console.log("before");
         this.stickerContract.methods.mint(tokenId, supply, uri, royalty).send(transactionParams)
             .on('transactionHash', (hash) => {
               console.log("transactionHash", hash);
@@ -78,9 +81,10 @@ export class NFTContractStickerService {
             })
             .on('error', (error, receipt) => {
               resolve(receipt);
-              console.error("mint error===");
-              console.error("error", error);
+              console.error("error", error, receipt);
             });
+
+        this.checkTokenState(tokenId);
       });
     }
     
@@ -94,11 +98,16 @@ export class NFTContractStickerService {
 
     async createTxParams(data){
       let accountAddress = this.walletConnectControllerService.getAccountAddress();
-      let gas = await this.web3.eth.estimateGas(data,(error,gas)=>{
-        console.log("===gas error===",error);;
-        console.log("===gas gas===",gas);;
-
-      })
+      let gas = 80000;
+      try{
+        let gas = await this.web3.eth.estimateGas(data,(error,gas)=>{
+          console.log("===gas error===",error);;
+          console.log("===gas gas===",gas);;
+        })
+      }catch(error){
+        console.log("error", error);
+      }
+      
       console.log("===gas ===",gas);
       let gasPrice = await this.web3.eth.getGasPrice();
       return {
@@ -111,44 +120,55 @@ export class NFTContractStickerService {
     }
 
 
-    public async testWalletConnectMint() {
-      let contractAbi = require("../../assets/contracts/erc721.abi.json");
-      // let contractAbi = contracttest.stickerABI;
-      let contractAddress = "0x5b462bac2d07223711aA0e911c846e5e0E787654"; // Elastos Testnet
-      let accountAddress = this.walletConnectControllerService.getAccountAddress();
-      let walletConnectWeb3 = this.walletConnectControllerService.getWeb3();
-      let contract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
-      console.log(contract);
+    // public async testWalletConnectMint() {
+    //   let contractAbi = require("../../assets/contracts/erc721.abi.json");
+    //   // let contractAbi = contracttest.stickerABI;
+    //   let contractAddress = "0x5b462bac2d07223711aA0e911c846e5e0E787654"; // Elastos Testnet
+    //   let accountAddress = this.walletConnectControllerService.getAccountAddress();
+    //   let walletConnectWeb3 = this.walletConnectControllerService.getWeb3();
+    //   let contract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
+    //   console.log(contract);
   
-      let gasPrice = await walletConnectWeb3.eth.getGasPrice();
-      console.log("Gas price:", gasPrice);
+    //   let gasPrice = await walletConnectWeb3.eth.getGasPrice();
+    //   console.log("Gas price:", gasPrice);
   
-      console.log("Sending transaction with account address:", accountAddress);
-      let transactionParams = {
-          from: accountAddress,
-          gasPrice: gasPrice,
-          gas: 5000000,
-          value: 0
-      };
+    //   console.log("Sending transaction with account address:", accountAddress);
+    //   let transactionParams = {
+    //       from: accountAddress,
+    //       gasPrice: gasPrice,
+    //       gas: 5000000,
+    //       value: 0
+    //   };
   
-      let tokenId = Math.floor(Math.random()*10000000000);
-      let tokenUri = "https://my.token.uri.com";
-      console.log("Calling smart contract through wallet connect", accountAddress, tokenId, tokenUri);
-      contract.methods.mint(accountAddress, tokenId, tokenUri).send(transactionParams)
-          .on('transactionHash', (hash) => {
-            console.log("transactionHash==>", hash);
-          })
-          .on('receipt', (receipt) => {
-            console.log("receipt==>", receipt);
-          })
-          .on('confirmation', (confirmationNumber, receipt) => {
-            console.log("confirmation==>", confirmationNumber, receipt);
-          })
-          .on('error', (error, receipt) => {
-            console.error("mint error===>",error,receipt);
-          })
-          // .then((result)=>{
-          //   console.log("receive result=>",result);
-          // });
+    //   let tokenId = Math.floor(Math.random()*10000000000);
+    //   let tokenUri = "https://my.token.uri.com";
+    //   console.log("Calling smart contract through wallet connect", accountAddress, tokenId, tokenUri);
+    //   contract.methods.mint(accountAddress, tokenId, tokenUri).send(transactionParams)
+    //       .on('transactionHash', (hash) => {
+    //         console.log("transactionHash==>", hash);
+    //       })
+    //       .on('receipt', (receipt) => {
+    //         console.log("receipt==>", receipt);
+    //       })
+    //       .on('confirmation', (confirmationNumber, receipt) => {
+    //         console.log("confirmation==>", confirmationNumber, receipt);
+    //       })
+    //       .on('error', (error, receipt) => {
+    //         console.error("mint error===>",error,receipt);
+    //       })
+
+    //     this.checkTokenState(tokenId);
+    // }
+
+    checkTokenState(tokenId){
+      const checkTokenInterval = setInterval(async () => {
+        let info = await this.tokenInfo(tokenId);
+        console.log("Token info is", info);
+        // if (info){
+        //   clearInterval(checkTokenInterval);
+        // }
+      }, 5000);
     }
+
+    
 }
